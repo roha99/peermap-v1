@@ -32,6 +32,6 @@
 <style>
     @import 'leaflet/dist/leaflet.css';
     main div {
-        height: 800px;
+        height: 100vh;
     }
 </style>
