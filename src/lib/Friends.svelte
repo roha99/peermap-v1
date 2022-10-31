@@ -1,6 +1,7 @@
 <script>
 
-    import { gun,user } from './initGUN';
+  import { gun,user } from './initGUN';
+  import Marker from './Marker.svelte';
 
 	const ref = user.get('friends');
 	let store = {}; // create a local store to cache data from GUN
@@ -11,6 +12,10 @@
 		if (friend) {
 			// update the store with the new value
 			store[key] = friend;
+			// get and set the location for each friend
+			gun.get(friend.location).once(loc => {
+				store[key].location = loc;
+			});
 		} else {
 			// a key may contain a null value (if data has been deleted or set to null)
 			// if so, we remove the item from the store
@@ -30,17 +35,20 @@
 		}
 	}
 
-    $: friends = Object.entries(store);
+  $: friends = Object.entries(store);
 
-    // other "write" actions
+	// other "write" actions
 	const remove = key => ref.get(key).put(null);
 
 </script>
 
-
 {#each friends as [key,friend]}
 
 	<h4 class="leaflet-control ">{friend.alias} : {friend.pub} <button class="leaflet-bar" on:click={()=>remove(key)}>remove</button></h4>
+	
+	{#if friend.location.lat && friend.location.lng}
+		<Marker lat={friend.location.lat} lng={friend.location.lng} alias={friend.alias}/>
+	{/if}
 
 {/each}
 

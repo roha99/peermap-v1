@@ -13,7 +13,8 @@
     let MAP;
 
     onMount(async () => {
-        MAP = map(container).setView([51.505, -0.09], 4);
+        MAP = map(container,{ zoomControl:false, attributionControl:false });
+        MAP.fitWorld();
         tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(MAP);
     });
 

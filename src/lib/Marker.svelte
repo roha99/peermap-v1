@@ -1,6 +1,6 @@
 <script>
 
-    import { getContext } from 'svelte';
+	import { getContext } from 'svelte';
 	import { marker } from 'leaflet';
 
 	const { getMap } = getContext('leaflet');
@@ -8,7 +8,8 @@
 
 	export let lat;
 	export let lng;
+	export let alias;
 
-	marker([lat,lng]).addTo(map);
+	marker([lat,lng]).bindPopup(alias).addTo(map);
 
 </script>
