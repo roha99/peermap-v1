@@ -3,10 +3,10 @@
   import Map from './lib/Map.svelte';
   import Marker from './lib/Marker.svelte';
 
-  import { username,sign_up,sign_in,sign_out } from './lib/gun';
+  import Login from './lib/Login.svelte';
+  import Logout from './lib/Logout.svelte';
 
-  let user;
-  let pass;
+  let state = false;
 
 </script>
 
@@ -19,20 +19,26 @@
 
     <div class="leaflet-top leaflet-right">
 
-      {#if $username}
+      {#if state}
       
-        <button class="leaflet-control" on:click={sign_out}>sign out</button>
+        <Logout bind:state={state}/>
 
       {:else}
         
-        <input class="leaflet-control" bind:value={user} type="text" placeholder="user">
-        <input class="leaflet-control" bind:value={pass} type="password" placeholder="password">
-
-        <button class="leaflet-control" on:click={() => sign_in(user,pass)}>sign in</button>
-        <button class="leaflet-control" on:click={() => sign_up(user,pass)}>sign up</button>
+        <Login bind:state={state}/>
 
       {/if}
       
+    </div>
+
+    <div class="leaflet-bottom leaflet-left">
+      
+      {#if state}
+
+        <h4 class="leaflet-control">yaaas</h4>
+        
+      {/if}
+
     </div>
 
   </Map>
