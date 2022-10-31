@@ -5,6 +5,7 @@
 
   import Login from './lib/Login.svelte';
   import Logout from './lib/Logout.svelte';
+  import Friends from './lib/Friends.svelte';
 
   let state = false;
 
@@ -35,7 +36,7 @@
       
       {#if state}
 
-        <h4 class="leaflet-control">yaaas</h4>
+        <Friends/>
         
       {/if}
 
