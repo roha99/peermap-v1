@@ -4,7 +4,7 @@ import 'gun/sea';
 // init and export gun
 export const gun = GUN({
   peers : [
-    'http://gun-manhattan.herokuapp.com/gun',
+    'https://gun-manhattan.herokuapp.com/gun',
   ],
 });
 
