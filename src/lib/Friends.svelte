@@ -19,7 +19,7 @@
 	};
 
 	// other "write" actions
-	const remove = key => ref.get(key).put(null);
+	const remove = key => ref.get(key).put(null); // seems broken
 
 </script>
 
@@ -30,8 +30,8 @@
 		<button class="leaflet-bar" on:click={()=>remove(key)}>remove</button>
 	</h4>
 
-	{#if friend.lat && friend.lng}
-		<Marker lat={friend.lat} lng={friend.lng} alias={friend.alias}/>
+	{#if friend.lat && friend.lng && friend.accuracy}
+		<Marker lat={friend.lat} lng={friend.lng} accuracy={friend.accuracy} color=red alias={friend.alias}/>
 	{/if}
 
 {/each}

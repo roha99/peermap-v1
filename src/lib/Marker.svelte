@@ -1,5 +1,6 @@
 <script>
 
+	import { onDestroy } from 'svelte';
 	import { getContext } from 'svelte';
 	import { circle } from 'leaflet';
 
@@ -8,10 +9,14 @@
 
 	export let lat;
 	export let lng;
+	export let accuracy;
+	export let color;
 	export let alias;
 
-	circle([lat,lng],{color:'red'})
+	let c = circle([lat,lng],accuracy,{color:color})
 		.bindPopup(String(alias))
 		.addTo(map);
 
+	onDestroy( () => { if (map.hasLayer(c)) map.removeLayer(c); });
+	
 </script>
