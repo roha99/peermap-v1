@@ -19,14 +19,20 @@
     // add to map
     if (map.hasLayer(c)) map.removeLayer(c);
     c = circle(e.latlng,e.accuracy);
+    c.bindPopup(String(user.is.alias));
     c.addTo(map);
     // put to GUN
-    let ref = user.get('location');
-    ref.put({
-      lat : e.latlng.lat,
-      lng : e.latlng.lng,
-      accuracy : e.accuracy,
-    });
+    let lat = user.get('lat');
+    let lng = user.get('lng');
+    let accuracy = user.get('accuracy');
+    lat.put(e.latlng.lat);
+    lng.put(e.latlng.lng);
+    accuracy.put(e.accuracy);
+    // location.put({
+    //   lat : e.latlng.lat,
+    //   lng : e.latlng.lng,
+    //   accuracy : e.accuracy,
+    // });
   }
 
   locate();
