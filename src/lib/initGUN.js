@@ -43,4 +43,4 @@ const options = {
 export const gun = GUN(options);
 
 // declare and export user
-export const user = gun.user();
+export const user = gun.user().recall({sessionStorage:true});
