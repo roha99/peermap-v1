@@ -1,9 +1,10 @@
 <script>
-  import { user } from './initGUN';
+  import { user,gun } from './initGUN';
 
   export let state;
 
-  // gun.on('auth',()=>state=true);
+  // necessary for recall
+  gun.on('auth',()=>state=true);
 
   let u,p;
 
