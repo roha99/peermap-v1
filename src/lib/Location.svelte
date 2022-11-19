@@ -32,6 +32,12 @@
 
 {#if $lat && $lng && $accuracy}
 
-  <Marker lat={$lat} lng={$lng} accuracy={$accuracy} color=green alias={user.is.alias}/>
+  <Marker
+    bind:lat={$lat}
+    bind:lng={$lng}
+    bind:accuracy={$accuracy}
+    bind:alias={user.is.alias}
+    color=green
+  />
 
 {/if}

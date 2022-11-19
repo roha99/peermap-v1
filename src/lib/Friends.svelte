@@ -25,13 +25,19 @@
 
 {#each $friends as [key,friend]}
 
-	<h4 class="leaflet-control ">
+	<h4 class="leaflet-control">
 		{friend.alias} : {friend.pub}
 		<button class="leaflet-bar" on:click={()=>remove(key)}>remove</button>
 	</h4>
 
 	{#if friend.lat && friend.lng && friend.accuracy}
-		<Marker lat={friend.lat} lng={friend.lng} accuracy={friend.accuracy} color=red alias={friend.alias}/>
+		<Marker
+			bind:lat={friend.lat}
+			bind:lng={friend.lng}
+			bind:accuracy={friend.accuracy}
+			bind:alias={friend.alias}
+			color=red
+		/>
 	{/if}
 
 {/each}
