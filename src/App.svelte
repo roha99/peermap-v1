@@ -1,57 +1,44 @@
 <script>
 
-  import Map from './lib/Map.svelte';
-  import Login from './lib/Login.svelte';
-  import Logout from './lib/Logout.svelte';
-  import Friends from './lib/Friends.svelte';
-  import Location from './lib/Location.svelte';
+  import Welcome from './components/Welcome.svelte';
+  import Navigation from './components/Navigation.svelte';
+  import Friends from './components/Friends.svelte';
+  import Map from './components/Map.svelte';
+  import Settings from './components/Settings.svelte';
 
-  let state = false;
+  let auth = false;
+  let route = 'map';
 
 </script>
 
-<main>
+{#if auth}
 
-  <Map>
-    
-    <div class="leaflet-top leaflet-right">
+  <div class="flex flex-col-reverse sm:flex-row h-screen">
 
-      {#if state}
-      
-        <Logout bind:state={state}/>
+    <Navigation bind:route={route}/>
 
-      {:else}
-        
-        <Login bind:state={state}/>
+    {#if route == 'friends'}
 
-      {/if}
-      
-    </div>
+      <Friends/>
 
-    <div class="leaflet-bottom leaflet-left">
-      
-      {#if state}
+    {/if}
 
-        <Friends/>
-        
-      {/if}
+    {#if route == 'map'}
 
-    </div>
+      <Map/>
 
-    <div class="leaflet-bottom leaflet-right">
+    {/if}
 
-      {#if state}
-      
-        <Location/>
-        
-      {/if}
+    {#if route == 'settings'}
 
-    </div>
+      <Settings bind:auth={auth}/>
 
-  </Map>
+    {/if}
 
-</main>
+  </div>
 
-<style>
+{:else}
 
-</style>
+  <Welcome bind:auth={auth}/>
+
+{/if}

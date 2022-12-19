@@ -1,5 +1,8 @@
 import 'gun/gun';
 import 'gun/sea';
+import 'gun/lib/webrtc';
+import 'gun/lib/open';
+import 'gun/lib/load';
 
 // https://svelte.dev/tutorial/auto-subscriptions
 GUN.chain.subscribe = function (publish) {
@@ -15,7 +18,8 @@ GUN.chain.subscribe = function (publish) {
 		
 		gun = gun.on((data, key, event) => {
 			
-			let _key = GUN.node.soul(data) || event.via.soul || key;
+			// let _key = GUN.node.soul(data) || event.via.soul || key;
+			let _key = key;
 			
 			if (data === null) { // remove this if clause if you want to return null values
 				cache.delete(_key)
