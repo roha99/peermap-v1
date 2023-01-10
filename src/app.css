@@ -4,24 +4,30 @@
 
 .nav {
   @apply
-  sm:w-1/6
-    sm:h-screen
-    h-1/6
-    sm:flex-col
-    flex-row
-    text-white
-    bg-slate-900
-    flex
-    justify-evenly
-    items-center;
+  flex
+  w-full sm:w-1/6
+  h-1/6 sm:h-full
+  flex-row sm:flex-col
+  text-white
+  bg-slate-900
+  justify-evenly
+  items-center;
 }
 
 .content {
   @apply
   bg-slate-200
-  w-screen sm:w-5/6
-  h-5/6 sm:h-screen
+  w-full sm:w-5/6
+  h-5/6 sm:h-full
   overflow-auto;
+}
+
+.box {
+  @apply
+  bg-slate-100
+  shadow-md
+  m-4
+  p-4;
 }
 
 .input {
@@ -48,12 +54,4 @@
   border-black
   bg-teal-400
   text-black;
-}
-
-.box {
-  @apply
-  bg-slate-100
-  shadow-md
-  m-4
-  p-4;
 }

@@ -30,6 +30,8 @@
 			gun.user(f).once((friend) => {
 				if (friend) {
 					ref.set(friend);
+				} else {
+					alert('friend not found - please try again');
 				}
 			});
 			f = undefined;
@@ -45,7 +47,7 @@
 
 	<div class="box">
 		
-		<input bind:value={f} type="text" placeholder="public key">
+		<input class="input" bind:value={f} type="text" placeholder="public key">
 		<button class="button" on:click={add}>add friend</button>
 
 	</div>

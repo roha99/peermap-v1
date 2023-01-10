@@ -1,121 +1,115 @@
 <script>
 
-    import { user } from '../initGUN';
+  import { gun,user } from '../initGUN';
+  import { onMount } from 'svelte';
+  import { map,tileLayer,circle } from 'leaflet';
 
-    import Marker from '../lib/Marker.svelte';
-
-    import { onMount,onDestroy,setContext } from 'svelte';
-
-    import { map,tileLayer } from 'leaflet';
-    
-    setContext('leaflet',{ getMap : () => MAP });
-
-    const ref = user.get('friends');
-	const friends = ref.map();
-    const alias = user.get('alias');
-
-    let loc = user.get('loc');
-    let location;
-    $: if ($loc) {
-        console.log($loc)
-        location = JSON.parse($loc);
-        console.log(location)
-    }
-
-    let lat = user.get('lat');
-    let lng = user.get('lng');
-    let accuracy = user.get('accuracy');
-
-    let container;
-    let MAP;
-
-    onMount(async () => {
-        MAP = map(container, {
-            zoomControl : false,
-            attributionControl : false,
-            worldCopyJump : true,
-            // maxBoundsViscosity : 1,
-            //maxBounds : bounds,
-        });
-        MAP.fitWorld();
-        tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(MAP);
-
-        MAP.on('locationfound',locationfound);
+  // --- map stuff --- >
+  let container,MAP;
+  onMount(() => {
+    MAP = map(container,{
+      zoomControl : false,
+      attributionControl : false,
+      worldCopyJump : true,
+      // maxBoundsViscosity : 1,
+      // maxBounds : bounds,
     });
+    tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
+    .addTo(MAP);
+    MAP.on('locationfound',location_found);
+    MAP.fitWorld();
+  });
 
-    onDestroy(async () => { if (MAP) MAP.remove(); });
+  // --- gerneral location stuff --- >
+  const identity = user._.sea; // cryptographic identity of user
+  let alias; user.get('alias').once(a => alias = a); // alias of user
+  const location = user.get('location'); // reference to location
+  const friends = user.get('friends'); // reference to friends
+  const locate = () => MAP.locate({setView:true});
+  // const remove = () => location.put(null);
 
-
-    function locate () {
-        MAP.locate({setView: true, maxZoom: 16});
+  // --- marker stuff --- >
+  const markers = {};
+  async function set (pub,location,secret,color,alias) {
+    if (location && location[identity.pub]) {
+      const data = await SEA.decrypt(location[identity.pub],secret);
+      if (markers[pub]) {
+        markers[pub]
+        .setLatLng([data.latitude,data.longitude])
+        .setRadius(data.accuracy);
+      } else {
+        markers[pub] = circle(
+          [data.latitude,data.longitude],
+          {radius:data.accuracy,color:color},
+        )
+        .bindPopup(alias)
+        .addTo(MAP);
+      }
+    } else if (markers[pub]) {
+      MAP.removeLayer(markers[pub]);
+      markers[pub] = null;
     }
+  }
 
-    function locationfound (e) {
-        // put to GUN
-        lat.put(e.latlng.lat);
-        lng.put(e.latlng.lng);
-        accuracy.put(e.accuracy);
-        // put as loc
-        let loc = {
-            lat : e.latlng.lat,
-            lng : e.latlng.lng,
-            accuracy : e.accuracy,
-        }
-        let str = JSON.stringify(loc);
-        user.get('loc').put(str);
-    }
+  // --- subscribe to location of user --- >
+  location.on(location => set(identity.pub,location,identity,'green',alias));
 
-    //console.log($friends)
+  // --- subscribe to locations of friends --- >
+  friends.map().once(friend => {
+    // get location of friend
+    gun.user(friend.pub).get('location').on(async location => {
+      const secret = await SEA.secret(friend.epub,identity);
+      set(friend.pub,location,secret,'red',friend.alias);
+    });
+  });
 
-    // for (let [key,friend] of $friends) {
-    //     console.log(friend)
-    // }
+  // --- set location --- >
+  async function location_found (e) {
+    // delete old location data from GUN
+    location.put(null);
+    // create new location object
+    const loc = {
+      latitude : e.latitude,
+      longitude : e.longitude,
+      accuracy : e.accuracy,
+    };
+    // encrypt and save for user
+    const data = await SEA.encrypt(loc,identity);
+    location.get(identity.pub).put(data);
+    // for each friend
+    friends.map().once(async friend => {
+      // determine shared secret
+      const secret = await SEA.secret(friend.epub,identity);
+      // encrypt location object
+      const data = await SEA.encrypt(loc,secret);
+      // save encrypted data to GUN
+      location.get(friend.pub).put(data);
+    });
+  }
 
 </script>
 
 <div class="content">
 
-    <div class="sm:h-screen h-full" bind:this={container}>
+  <div class="h-full" bind:this={container}>
 
-        {#if MAP}
-
-            {#if location}
-                <Marker
-                    bind:lat={location.lat}
-                    bind:lng={location.lng}
-                    bind:accuracy={location.accuracy}
-                    alias={$alias}
-                    color=green
-                />
-            {/if}
-        
-
-            {#each $friends as [key,friend]}
-
-                {#if (friend.lat && friend.lng && friend.accuracy)}
-                    <Marker
-                        bind:lat={friend.lat}
-                        bind:lng={friend.lng}
-                        bind:accuracy={friend.accuracy}
-                        bind:alias={friend.alias}
-                        color=red
-                    />
-                {/if}
-
-            {/each}
-
-            <div class="leaflet-top leaflet-right">
-                <button class="leaflet-control button" on:click={locate}>
-                    update my position
-                </button>
-            </div>
-
+    <div class="leaflet-top leaflet-right">
+      <button class="leaflet-control button" on:click={locate}>
+        {#if markers[identity.pub]}
+          update my position
+        {:else}
+          set my position
         {/if}
-
+      </button>
+      <!-- {#if markers[identity.pub]}
+        <button class="leaflet-control button" on:click={remove}>
+          remove my position
+        </button>
+      {/if} -->
     </div>
+
+  </div>
     
 </div>
 
-<style>
-    @import 'leaflet/dist/leaflet.css';
-</style>
+<style> @import 'leaflet/dist/leaflet.css'; </style>
