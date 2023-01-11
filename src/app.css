@@ -5,8 +5,8 @@
 .nav {
   @apply
   flex
-  w-full sm:w-1/6
-  h-1/6 sm:h-full
+  w-screen sm:w-1/6
+  h-1/6 sm:h-screen
   flex-row sm:flex-col
   text-white
   bg-slate-900
@@ -17,8 +17,8 @@
 .content {
   @apply
   bg-slate-200
-  w-full sm:w-5/6
-  h-5/6 sm:h-full
+  w-screen sm:w-5/6
+  h-5/6 sm:h-screen
   overflow-auto;
 }
 
@@ -54,4 +54,11 @@
   border-black
   bg-teal-400
   text-black;
+}
+
+/* https://benborgers.com/posts/tailwind-h-screen */
+@supports (-webkit-touch-callout: none) {
+  .h-screen {
+    height: -webkit-fill-available;
+  }
 }
