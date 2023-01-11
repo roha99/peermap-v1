@@ -14,7 +14,7 @@
     auth = false;
   }
 
-  const entries = Object.keys(peers);
+  $: entries = Object.keys(peers);
 
 </script>
 

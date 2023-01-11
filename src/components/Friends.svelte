@@ -1,33 +1,32 @@
 <script>
-	
+
 	import { gun,user } from '../initGUN';
 
+	let f,store = {};
 	const ref = user.get('friends');
-	let store = {};
-	
-	ref.map().on(async (data, key) => {
-		if (data) {
-			let tmp = {
-				alias : data.alias,
-				pub : data.pub,
+	$: friends = Object.entries(store);
+
+	// subscribe to friends
+	ref.map().on((friend,key) => {
+		if (friend) {
+			store[key] = {
+				alias : friend.alias,
+				pub : friend.pub,
+				mutual : false,
 			};
-			store[key] = tmp;
+			gun.user(friend.pub).get('friends').once(f => {
+				if (f[user._.soul]) store[key].mutual = true;
+			});
     } else {
-			// gun.map() can return null (deleted) values for keys
-			// if so, this else clause will update your local variable
-			delete store[key]
+			// .map() can return null for deleted data
+			delete store[key];
 			store = store;
     }
-	})
-
-	$: cats = Object.entries(store);
-
-	const friends = ref.map();
-	let f;
+	});
 
 	const add = () => {
 		if (f) {
-			gun.user(f).once((friend) => {
+			gun.user(f).once(friend => {
 				if (friend) {
 					ref.set(friend);
 				} else {
@@ -38,8 +37,7 @@
 		}
 	};
 
-	// other "write" actions
-	const remove = key => ref.get(key).put(null); // seems broken
+	const remove = key => ref.get(key).put(null);
 
 </script>
 
@@ -52,39 +50,28 @@
 
 	</div>
 
-	{#each $friends as [key,friend]}
+	{#each friends as [key,friend]}
 	
 		<div class="flex flex-col box gap-4">
 
-			<div class="text-2xl w-fit p-4 border-2
-			border-black
-			bg-teal-400">{friend.alias}</div>
-			<div class="break-all w-fit p-4 border-2
-			border-black
-			bg-teal-400">{friend.pub}</div>
+			<div class="flex flex-row gap-4">
+
+				<div class="text-2xl w-fit p-4 border-2 border-black bg-teal-400">
+					{friend.alias}
+				</div>
+
+				{#if friend.mutual}
+					<div class="text-6xl">&#129309</div>
+				{/if}
+
+			</div>
+
+
+			<div class="break-all w-fit p-4 border-2 border-black bg-teal-400">
+				{friend.pub}
+			</div>
 
 			<button class="button w-fit" on:click={()=>remove(key)}>remove</button>
-
-			{JSON.stringify(friend)}
-
-		</div>
-
-	{/each}
-
-	{#each cats as [key,friend]}
-	
-		<div class="flex flex-col box gap-4">
-
-			<div class="text-2xl w-fit p-4 border-2
-			border-black
-			bg-teal-400">{friend.alias}</div>
-			<div class="break-all w-fit p-4 border-2
-			border-black
-			bg-teal-400">{friend.pub}</div>
-
-			<button class="button w-fit" on:click={()=>remove(key)}>remove</button>
-
-			{JSON.stringify(friend)}
 
 		</div>
 
