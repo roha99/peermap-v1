@@ -1,8 +1,8 @@
 <script>
 
-  import { gun,user } from '../initGUN';
+  import { user } from '../initGUN';
   import { onMount } from 'svelte';
-  import { map,tileLayer,circle } from 'leaflet';
+  import { map,tileLayer,circle,featureGroup } from 'leaflet';
 
   // --- map stuff --- >
   let container,MAP;
@@ -11,8 +11,6 @@
       zoomControl : false,
       attributionControl : false,
       worldCopyJump : true,
-      // maxBoundsViscosity : 1,
-      // maxBounds : bounds,
     });
     tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
     .addTo(MAP);
@@ -22,17 +20,18 @@
 
   // --- gerneral location stuff --- >
   const identity = user._.sea; // cryptographic identity of user
-  let alias; user.get('alias').once(a => alias = a); // alias of user
+  let alias; user.get('alias').on(a => alias = a); // alias of user
   const location = user.get('location'); // reference to location
   const friends = user.get('friends'); // reference to friends
-  const locate = () => MAP.locate({setView:true});
+  const locate = () => MAP.locate();
   // const remove = () => location.put(null);
 
   // --- marker stuff --- >
-  const markers = {};
-  async function set (pub,location,secret,color,alias) {
-    if (location && location[identity.pub]) {
-      const data = await SEA.decrypt(location[identity.pub],secret);
+  let markers = {};
+  async function set (pub,loc,secret,color,alias) {
+    loc = JSON.parse(loc);
+    if (loc && loc[identity.pub]) {
+      const data = await SEA.decrypt(loc[identity.pub],secret);
       if (markers[pub]) {
         markers[pub]
         .setLatLng([data.latitude,data.longitude])
@@ -47,43 +46,54 @@
       }
     } else if (markers[pub]) {
       MAP.removeLayer(markers[pub]);
-      markers[pub] = null;
+      delete markers[pub];
+      markers = markers;
+    }
+    // set view to fit all markers
+    const array = Object.values(markers);
+    if (array.length) {
+      const group = featureGroup(array);
+      MAP.fitBounds(group.getBounds().pad(0.5));
     }
   }
 
   // --- subscribe to location of user --- >
-  location.on(location => set(identity.pub,location,identity,'green',alias));
+  location.on(loc => set(identity.pub,loc,identity,'green',alias));
 
   // --- subscribe to locations of friends --- >
-  friends.map().once(friend => {
-    // get location of friend
-    gun.user(friend.pub).get('location').on(async location => {
+  friends.map().on(async friend => {
+    if (friend) {
       const secret = await SEA.secret(friend.epub,identity);
-      set(friend.pub,location,secret,'red',friend.alias);
-    });
+      set(friend.pub,friend.location,secret,'red',friend.alias);
+    }
   });
 
   // --- set location --- >
   async function location_found (e) {
-    // delete old location data from GUN
-    location.put(null);
-    // create new location object
-    const loc = {
+    // create position object
+    const position = {
       latitude : e.latitude,
       longitude : e.longitude,
       accuracy : e.accuracy,
     };
-    // encrypt and save for user
-    const data = await SEA.encrypt(loc,identity);
-    location.get(identity.pub).put(data);
+    // encrypt for user
+    const data = await SEA.encrypt(position,identity);
+    // create temporary object
+    const tmp = { [identity.pub] : data };
+    // stringify and save to GUN
+    location.put(JSON.stringify(tmp));
     // for each friend
     friends.map().once(async friend => {
-      // determine shared secret
-      const secret = await SEA.secret(friend.epub,identity);
-      // encrypt location object
-      const data = await SEA.encrypt(loc,secret);
-      // save encrypted data to GUN
-      location.get(friend.pub).put(data);
+      if (friend) {
+        // determine shared secret
+        const secret = await SEA.secret(friend.epub,identity);
+        // encrypt for friend
+        const data = await SEA.encrypt(position,secret);
+        // add to temporary object
+        tmp[friend.pub] = data;
+        // stringify and save to GUN
+        location.put(JSON.stringify(tmp));
+      }
     });
   }
 
