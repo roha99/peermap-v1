@@ -13,7 +13,7 @@
 
 {#if auth}
 
-  <div class="flex flex-col-reverse sm:flex-row h-screen">
+  <div class="flex flex-col-reverse sm:flex-row h-screen overscroll-none">
 
     <Navigation bind:route={route}/>
 
