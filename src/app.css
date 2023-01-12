@@ -55,10 +55,3 @@
   bg-teal-400
   text-black;
 }
-
-/* https://benborgers.com/posts/tailwind-h-screen */
-@supports (-webkit-touch-callout: none) {
-  .h-screen {
-    height: -webkit-fill-available;
-  }
-}
