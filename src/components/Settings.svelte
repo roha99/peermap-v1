@@ -4,37 +4,42 @@
 
   export let auth;
 
-  let peers = gun.back('opt.peers');
-
-  let alias = user.get('alias');
-  let key = user.get('pub');
+  const peers = gun.back('opt.peers');
+  const alias = user.get('alias');
+  const key = user.get('pub');
 
   function sign_out () {
     user.leave();
     auth = false;
   }
 
-  $: entries = Object.keys(peers);
+  $: keys = Object.keys(peers);
 
 </script>
 
 <div class="content">
 
-  <div class="box break-all">
+  <div class="flex flex-col box gap-4">
 
-    {$alias} : {$key}
+    <div class="text-2xl w-fit p-4 border-2 border-black bg-teal-400">
+      {$alias}
+    </div>
 
-    <button class="button" on:click={sign_out}>sign out</button>
+    <div class="break-all w-fit p-4 border-2 border-black bg-teal-400">
+      {$key}
+    </div>
+
+    <button class="button w-fit" on:click={sign_out}>sign out</button>
 
   </div>
 
   <div class="box">
 
-    {#each entries as entry}
-      {entry}<br>
+    {#each keys as key}
+      {key}<br>
     {/each}
 
-    {Object.keys(peers).length}
+    {keys.length}
 
   </div>
 
