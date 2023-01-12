@@ -5,7 +5,6 @@
 .nav {
   @apply
   flex
-  overscroll-contain
   w-screen sm:w-1/6
   h-1/6 sm:h-screen
   flex-row sm:flex-col
@@ -17,7 +16,6 @@
 
 .content {
   @apply
-  overscroll-contain
   bg-slate-200
   w-screen sm:w-5/6
   h-5/6 sm:h-screen
