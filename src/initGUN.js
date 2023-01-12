@@ -1,8 +1,15 @@
 import 'gun/gun';
 import 'gun/sea';
 import 'gun/lib/webrtc';
-import 'gun/lib/open';
-import 'gun/lib/load';
+
+// fetch relay peers for bootstrapping
+const res = await fetch('https://raw.githubusercontent.com/wiki/amark/gun/volunteer.dht.md');
+const data = await res.text();
+const urls = data.match(/\bhttps?:\/\/\S+/gi);
+
+const options = {
+  peers : urls,
+}
 
 // https://svelte.dev/tutorial/auto-subscriptions
 GUN.chain.subscribe = function (publish) {
@@ -36,12 +43,6 @@ GUN.chain.subscribe = function (publish) {
 	// unsubscribe
 	return () => gun.off();
 };
-
-const options = {
-  peers : [
-    'https://gun-manhattan.herokuapp.com/gun',
-  ],
-}
 
 // init and export gun
 export const gun = GUN(options);

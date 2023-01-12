@@ -6,7 +6,7 @@
 
   const peers = gun.back('opt.peers');
   const alias = user.get('alias');
-  const key = user.get('pub');
+  const pub = user.get('pub');
 
   function sign_out () {
     user.leave();
@@ -26,7 +26,7 @@
     </div>
 
     <div class="break-all w-fit p-4 border-2 border-black bg-teal-400">
-      {$key}
+      {$pub}
     </div>
 
     <button class="button w-fit" on:click={sign_out}>sign out</button>
@@ -35,11 +35,11 @@
 
   <div class="box">
 
-    {#each keys as key}
-      {key}<br>
-    {/each}
+    <div class="text-xl font-bold">you are connected to {keys.length} peer(s)</div>
 
-    {keys.length}
+    {#each keys as key}
+      <div>{key}</div>
+    {/each}
 
   </div>
 
