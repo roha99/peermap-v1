@@ -18,32 +18,23 @@ const options = {
   peers : urls,
 }
 
-// https://svelte.dev/tutorial/auto-subscriptions
 GUN.chain.subscribe = function (publish) {
 	let gun = this;
 	let at = gun._;
-	// check if map() has been called
-	let is_map = !!(at.back || {}).each;
+	// check if .map() has been called
+	const is_map = !!(at.back || {}).each;
 	if (is_map) {
-		
-    // create a temporary store for all values passed by map()
+    // create a temporary store for all values passed by .map()
 		let cache = new Map();
 		publish(Array.from(cache));
-		
-		gun = gun.on((data, key, event) => {
-			
-			// let _key = GUN.node.soul(data) || event.via.soul || key;
-			let _key = key;
-			
-			if (data === null) { // remove this if clause if you want to return null values
-				cache.delete(_key)
+		gun = gun.on((data,key) => {
+			if (data) {
+				cache.set(key,data);
 			} else {
-				cache.set(_key, data)
+				cache.delete(key);
 			}
-			
-			publish(Array.from(cache))
-		})
-		
+			publish(Array.from(cache));
+		});
 	} else {
 		gun = gun.on(publish);
 	}
