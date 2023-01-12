@@ -43,7 +43,7 @@
 
 <div class="content">
 
-	<div class="box">
+	<div class="box flex flex-wrap gap-4">
 		
 		<input class="input" bind:value={f} type="text" placeholder="public key">
 		<button class="button" on:click={add}>add friend</button>
