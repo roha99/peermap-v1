@@ -3,9 +3,16 @@ import 'gun/sea';
 import 'gun/lib/webrtc';
 
 // fetch relay peers for bootstrapping
-const res = await fetch('https://raw.githubusercontent.com/wiki/amark/gun/volunteer.dht.md');
-const data = await res.text();
-const urls = data.match(/\bhttps?:\/\/\S+/gi);
+// const res = await fetch('https://raw.githubusercontent.com/wiki/amark/gun/volunteer.dht.md');
+// const data = await res.text();
+// const urls = data.match(/\bhttps?:\/\/\S+/gi);
+
+const urls = [
+	'https://gun-manhattan.herokuapp.com/gun',
+	'https://relay.129.153.59.37.nip.io/gun',
+	'https://relay.peer.ooo/gun',
+	'https://peer.wallie.io/gun',
+];
 
 const options = {
   peers : urls,
